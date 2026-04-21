@@ -1,0 +1,78 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+*:not(dialog) {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+input, button, textarea, select {
+  font: inherit;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+p {
+  text-wrap: pretty;
+}
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+#root, #__next {
+  isolation: isolate;
+}
+
+
+
+.metronomeClicksContainer{
+    width: 40%;
+    display: flex;
+    flex-direction: row;
+}
+
+.metronomeClicksContainer div {
+    background-color: gray;
+    border-radius: 50%;
+    width: 2.5rem; /* Aumentei um pouco para ficar melhor de ver */
+    height: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    margin: 5px;
+    transition: background-color 0.1s;
+}
+
+/* Removi o :first-child fixo para a animação funcionar */
+
+/* Esta classe será aplicada pelo JS */
+.metronomeClicksContainer div.active {
+    background-color: #8a2be2 !important; /* Roxo vibrante */
+    box-shadow: 0 0 15px #8a2be2;
+    transform: scale(1.1); /* Dá um leve pulinho visual */
+}
+
+/* Dica extra: Cor diferente para a batida forte (Beat 1) */
+.metronomeClicksContainer div.active.forte {
+    background-color: #5f2297 !important; /* Laranja/Vermelho para o tempo 1 */
+    box-shadow: 0 0 15px #5f2297;
+}

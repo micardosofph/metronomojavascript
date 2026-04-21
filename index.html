@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="metronome">
+        <div>
+            <input type="range" id="bpm-slider" min="40" max="260" value="100">
+            <span id="bpm-display">100</span> BPM
+            <button id="start-stop">Start</button>
+        </div>
+
+    </div>
+    <div class="metronomeClicksContainer">
+        <div class="metronomeBall active forte">1</div>
+        <div class="metronomeBall">2</div>
+        <div class="metronomeBall">3</div>
+        <div class="metronomeBall">4</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
