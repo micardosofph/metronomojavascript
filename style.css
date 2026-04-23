@@ -1,3 +1,8 @@
+:root {
+  --bg-color: #ffffff;
+  --hover-color: #8B5CF6;
+}
+
 *,
 *::before,
 *::after {
@@ -63,6 +68,116 @@ h6 {
   isolation: isolate;
 }
 
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 100vh;
+  width: 100vw;
+}
+
+.flex {
+  display: flex;
+}
+
+#metronome {
+  display: flex;
+  flex-direction: column;
+
+  gap: 1rem;
+
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  width: 100%;
+
+  padding: 0 12vw;
+  padding-bottom: 1rem;
+  margin: 0 15vw;
+
+  user-select: none;
+  -moz-user-select: none;
+}
+
+#beat-counter {
+  text-align: center;
+  font-size: 48px;
+}
+
+#increaseTempo,
+#decreaseTempo {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  color: #333;
+  display: flex;
+  height: 40px;
+  min-width: 40px;
+  transition: all .2s ease;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+#increaseTempo:hover,
+#decreaseTempo:hover {
+  background-color: var(--hover-color);
+}
+
+#bpm-slider {
+  width: 100%;
+  margin: 0 1rem;
+
+  background-color: transparent;
+}
+
+input[type="range"] {
+  appearance: none;
+  width: 100%;
+  background: transparent;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
+input[type=range]:focus {
+  outline: none;
+}
+
+/* Special styling for WebKit/Blink */
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  margin: -6px 0 0 0;
+  background: #767676;
+  cursor: pointer;
+
+  transition: background-color 0.1s;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  background-color: var(--hover-color);
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 25%;
+  cursor: pointer;
+  background: #dddddd;
+  border-radius: 5px;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #dddddd;
+}
 
 
 .metronomeClicksContainer {
@@ -70,13 +185,14 @@ h6 {
   gap: 8px;
   grid-template-rows: repeat(2, auto);
   transition: all 0.3s ease;
+  justify-content: space-evenly;
 }
 
-.metronomeClicksContainer div {
+.visualBeat {
   background-color: gray;
   border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 5vw;
+  height: 5vw;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -85,10 +201,12 @@ h6 {
   transition: all 0.3s ease;
 }
 
-/* Removi o :first-child fixo para a animação funcionar */
+.visualBeat span {
+  font-size: 24px;
+}
 
 /* Esta classe será aplicada pelo JS */
-.metronomeClicksContainer div.active {
+.visualBeat.active {
   background-color: #8a2be2 !important;
   /* Roxo vibrante */
   box-shadow: 0 0 15px #8a2be2;
@@ -97,8 +215,24 @@ h6 {
 }
 
 /* Dica extra: Cor diferente para a batida forte (Beat 1) */
-.metronomeClicksContainer div.active.forte {
+.visualBeat.active.forte {
   background-color: #5f2297 !important;
   /* Laranja/Vermelho para o tempo 1 */
   box-shadow: 0 0 15px #5f2297;
+}
+
+.controlBpmAndPlayerContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+#start-stop {
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .visualBeat {
+    width: 15vw;
+    height: 15vw;
+  }
 }
