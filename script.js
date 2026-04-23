@@ -3,24 +3,91 @@ let isPlaying = false;
 let nextStartTime = 0;
 let bpm = 100;
 let timerId = null;
-let batidaAtual = 0;
-const batidasPorCompasso = 4;
 
-// Selecionamos todas as bolinhas de uma vez (vira um Array/Lista)
-const bolinhas = document.querySelectorAll('.metronomeBall');
+let currentBeat = 0;
+let beatsPerBar = 4;
+
+// Selecionamos todas as visualBeat de uma vez (vira um Array/Lista)
+const visualBeats = document.querySelectorAll('.metronomeBall');
 
 const bpmSlider = document.getElementById('bpm-slider');
 const bpmDisplay = document.getElementById('bpm-display');
 const startStopBtn = document.getElementById('start-stop');
+
+const metronomeBeatsContainer = document.getElementById('beats-container');
+const beatsButtonMinus = document.getElementById('metronome-controls-button-minus');
+const beatsButtonPlus = document.getElementById('metronome-controls-button-plus');
+const beatCount = document.getElementById('metronome-controls-beat-count');
+
+let MIN_BEATS = 2;
+let MAX_BEATS = 12;
 
 bpmSlider.oninput = () => {
     bpm = bpmSlider.value;
     bpmDisplay.innerText = bpm;
 };
 
+//função pra renderizar as batidas selecionadas pelo usuário
+function renderBeats(){
+    metronomeBeatsContainer.innerHTML = '';
+    for(let i = 1; i <= beatsPerBar; i++){
+        createVisualBeatElement(i);
+    }
+}
+
+//função para 'montar' quantidades de batidas/bolinhas
+function createVisualBeatElement(iteration){
+    const divBeat = document.createElement('div');
+    divBeat.classList.add('visualBeat');
+    const spanBeatNumber = document.createElement('span');
+    spanBeatNumber.textContent = iteration;
+    divBeat.appendChild(spanBeatNumber);
+    metronomeBeatsContainer.appendChild(divBeat);
+}
+
+function updateGridLayout() {
+  // Calcula quantas colunas são necessárias para manter apenas 2 linhas
+  // Se tivermos 8 batidas, precisamos de 4 colunas.
+  // Se tivermos 7 batidas, precisamos de 4 colunas (uma fica vazia embaixo).
+  let columns;
+
+  if (beatsPerBar <= 5) {
+    columns = beatsPerBar;
+  } else {
+    // Se for > 5, divide por 2 e arredonda para cima
+    columns = Math.ceil(beatsPerBar / 2);
+  }
+  
+  // Aplica dinamicamente ao estilo do container
+  metronomeBeatsContainer.style.gridTemplateColumns = `repeat(${columns}, auto)`;
+}
+
+// Lógica do botão Adicionar
+beatsButtonPlus.addEventListener('click', () => {
+  if (beatsPerBar < MAX_BEATS) {
+    beatsPerBar++;
+    beatCount.textContent = beatsPerBar;
+    createVisualBeatElement();
+    renderBeats();
+    updateGridLayout();
+  }
+});
+
+// Lógica do botão Remover
+beatsButtonMinus.addEventListener('click', () => {
+  if (beatsPerBar > MIN_BEATS) {
+    beatsPerBar--;
+    beatCount.textContent = beatsPerBar;
+    // Remove o último filho do container
+    metronomeBeatsContainer.lastElementChild.remove();
+    renderBeats();
+    updateGridLayout();
+  }
+});
+
 // Função para atualizar a cor na tela
-function atualizarVisual(indice) {
-    bolinhas.forEach((b, i) => {
+function updateBallVisual(indice) {
+    visualBeats.forEach((b, i) => {
         b.classList.remove('active');
         b.classList.remove('forte'); // Limpa a classe de batida forte
         
@@ -32,40 +99,40 @@ function atualizarVisual(indice) {
     });
 }
 
-function playClick(numeroDaBatida, tempoDeExecucao) {
+function playClick(beatNumber, executionTime) {
     const osc = audioContext.createOscillator();
     const envelope = audioContext.createGain();
 
-    if (numeroDaBatida % batidasPorCompasso === 0) {
+    if (beatNumber % beatsPerBar === 0) {
         osc.frequency.value = 1200; 
     } else {
         osc.frequency.value = 800;  
     }
 
     envelope.gain.value = 1;
-    envelope.gain.exponentialRampToValueAtTime(1, tempoDeExecucao + 0.001);
-    envelope.gain.exponentialRampToValueAtTime(0.001, tempoDeExecucao + 0.05);
+    envelope.gain.exponentialRampToValueAtTime(1, executionTime + 0.001);
+    envelope.gain.exponentialRampToValueAtTime(0.001, executionTime + 0.05);
 
     osc.connect(envelope);
     envelope.connect(audioContext.destination);
 
-    osc.start(tempoDeExecucao);
-    osc.stop(tempoDeExecucao + 0.05);
+    osc.start(executionTime);
+    osc.stop(executionTime + 0.05);
 
     // --- SINCRONIZAÇÃO VISUAL ---
     // Calculamos quanto tempo falta para o som tocar e agendamos a luz
-    const tempoAteOSom = (tempoDeExecucao - audioContext.currentTime) * 1000;
+    const timeUntilSound = (executionTime - audioContext.currentTime) * 1000;
     
     setTimeout(() => {
-        atualizarVisual(numeroDaBatida % batidasPorCompasso);
-    }, tempoAteOSom);
+        updateBallVisual(beatNumber % beatsPerBar);
+    }, timeUntilSound);
 }
 
 function scheduler() {
     while (nextStartTime < audioContext.currentTime + 0.1) {
-        playClick(batidaAtual, nextStartTime);
+        playClick(currentBeat, nextStartTime);
         nextStartTime += 60 / bpm;
-        batidaAtual++;
+        currentBeat++;
     }
     timerId = setTimeout(scheduler, 25);
 }
@@ -76,15 +143,18 @@ startStopBtn.onclick = () => {
     if (isPlaying) {
         clearTimeout(timerId);
         startStopBtn.innerText = "Start";
-        // Limpa as bolinhas ao parar
-        bolinhas.forEach(b => b.classList.remove('active'));
+        // Limpa as visualBeats ao parar
+        visualBeat.forEach(b => b.classList.remove('active'));
     } else {
         if (audioContext.state === 'suspended') audioContext.resume();
         
         nextStartTime = audioContext.currentTime;
-        batidaAtual = 0;
+        currentBeat = 0;
         scheduler();
         startStopBtn.innerText = "Stop";
     }
     isPlaying = !isPlaying;
 };
+
+renderBeats();
+updateGridLayout();
